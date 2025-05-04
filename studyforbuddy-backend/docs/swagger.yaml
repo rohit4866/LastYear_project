@@ -1,0 +1,1971 @@
+openapi: 3.0.0
+info:
+  title: StudyForBuddy API Documentation
+  version: 1.0.0
+  description: StudyForBuddy code  API backend
+components:
+  securitySchemes:
+    BearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      responses:
+        200:
+          description: Service is up and running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: UP
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2024-09-07T12:34:56Z'
+                  database:
+                    type: string
+                    example: Connected
+                  # Add other checks here if needed
+        500:
+          description: Service is down
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: DOWN
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2024-09-07T12:34:56Z'
+                  error:
+                    type: string
+                    example: Database connection failed
+
+  /professors/login:
+    post:
+      tags:
+        - Login
+      summary: User Login
+      description: Authenticate a user and return a JWT token on successful login.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: Password123
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: '12345'
+                      name:
+                        type: string
+                        example: 'John Doe'
+                      email:
+                        type: string
+                        example: 'user@example.com'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid email or password'
+
+  /professors/create:
+    post:
+      summary: Create a new professor
+      tags:
+        - Professors
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                password:
+                  type: string
+                profile_image:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Professor created successfully
+        500:
+          description: Internal server error
+
+  /professors/{id}:
+    get:
+      summary: Get professor by ID
+      tags:
+        - Professors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Professor ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful response
+        404:
+          description: Professor not found
+        500:
+          description: Internal server error
+  
+    put:
+      summary: Update professor details
+      tags:
+        - Professors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                password:
+                  type: string
+                profile_image:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: Professor updated successfully
+        404:
+          description: Professor not found
+        500:
+          description: Internal server error
+  
+    delete:
+      summary: Delete professor by ID
+      tags:
+        - Professors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Professor deleted successfully
+        404:
+          description: Professor not found
+        500:
+          description: Internal server error
+
+  /students:
+    post:
+      tags:
+        - Students
+      summary: Create a new student
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                password:
+                  type: string
+                profile_image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Created
+
+    get:
+      tags:
+        - Students
+      summary: Get all students
+      responses:
+        '200':
+          description: A list of students
+
+  /students/{id}:
+    get:
+      tags:
+        - Students
+      summary: Get student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student found
+
+    put:
+      tags:
+        - Students
+      summary: Update student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                mobile:
+                  type: string
+                password:
+                  type: string
+                profile_image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Updated
+
+    delete:
+      tags:
+        - Students
+      summary: Delete student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+          
+  /students/login:
+    post:
+      summary: "Login a student"
+      description: "Authenticate a student using their email and password"
+      tags:
+        - "Students"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "student@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "200":
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "e66c5f4e-5fdd-44b3-8c2d-706c7b0b1d6a"
+                      name:
+                        type: string
+                        example: "John Doe"
+                      email:
+                        type: string
+                        example: "student@example.com"
+                      mobile:
+                        type: string
+                        example: "1234567890"
+                      profile_image:
+                        type: string
+                        example: "http://localhost:3000/uploads/student_profile/profile.png"
+        "401":
+          description: "Invalid password"
+        "404":
+          description: "Student not found"
+        "500":
+          description: "Server error"
+
+  /classrooms:
+    post:
+      tags:
+        - Classrooms
+      summary: Create a new classroom
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                professor_id:
+                  type: string
+                  description: The ID of the professor associated with the classroom
+                  example: "550e8400-e29b-41d4-a716-446655440001"
+                classroom_name:
+                  type: string
+                  description: The name of the classroom
+                  example: "Math 101"
+                description:
+                  type: string
+                  description: A brief description of the classroom
+                  example: "Introduction to Mathematics"
+                classroom_code:
+                  type: string
+                  description: A unique code for the classroom
+                  example: "MTH101"
+              required:
+                - professor_id
+                - classroom_name
+                - classroom_code
+      responses:
+        '201':
+          description: Classroom created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the classroom
+                    example: "550e8400-e29b-41d4-a716-446655440001"
+                  professor_id:
+                    type: string
+                    description: The ID of the professor associated with the classroom
+                    example: "550e8400-e29b-41d4-a716-446655440001"
+                  classroom_name:
+                    type: string
+                    description: The name of the classroom
+                    example: "Math 101"
+                  description:
+                    type: string
+                    description: A brief description of the classroom
+                    example: "Introduction to Mathematics"
+                  classroom_code:
+                    type: string
+                    description: A unique code for the classroom
+                    example: "MTH101"
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the classroom was created
+                    example: "2024-04-10T10:30:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the classroom was last updated
+                    example: "2024-04-10T10:30:00Z"
+        '400':
+          description: Bad request if required fields are missing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "professor_id, classroom_name, and classroom_code are required"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to create classroom"
+
+  /classrooms/professor/{professor_id}:
+    get:
+      tags:
+        - Classrooms
+      summary: Get all classrooms by professor ID
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          description: The ID of the professor
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of classrooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Classroom'
+
+  /classrooms/{id}:
+    get:
+      tags:
+        - Classrooms
+      summary: Get a classroom by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A classroom object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classroom'
+        '404':
+          description: Classroom not found
+
+    put:
+      tags:
+        - Classrooms
+      summary: Update a classroom by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                classroom_name:
+                  type: string
+                  description: The name of the classroom
+                  example: "Math 101"
+                description:
+                  type: string
+                  description: A brief description of the classroom
+                  example: "Introduction to Mathematics"
+              required:
+                - professor_id
+                - classroom_name
+      responses:
+        '200':
+          description: Classroom updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Classroom'
+        '404':
+          description: Classroom not found
+
+    delete:
+      tags:
+        - Classrooms
+      summary: Delete a classroom by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Classroom deleted successfully
+        '404':
+          description: Classroom not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Classroom not found"
+        '200':
+          description: Successful deletion response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Classroom deleted successfully"
+
+  /classrooms/join:
+    post:
+      summary: "Join a classroom"
+      description: "Allows a student to join a classroom by providing the classroom code and student ID."
+      tags:
+        - Classroom Join
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - classroom_code
+                - student_id
+              properties:
+                classroom_code:
+                  type: string
+                  description: "The unique code of the classroom."
+                student_id:
+                  type: string
+                  format: uuid
+                  description: "The unique identifier of the student."
+              example:
+                classroom_code: "CLASS12345"
+                student_id: "987e6543-b21a-34c5-d678-123456789abc"
+      responses:
+        201:
+          description: "Successfully joined the classroom."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully joined the classroom"
+                  result:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        description: "Unique ID for the record in classroom_students table."
+                      classroom_code:
+                        type: string
+                        description: "The classroom code used to join."
+                      student_id:
+                        type: string
+                        format: uuid
+      400:
+        description: "Bad Request - Missing or invalid parameters."
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "classroom_code and student_id are required"
+      500:
+        description: "Internal Server Error - Failed to join classroom."
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  example: "Failed to join classroom"
+
+  /students/{student_id}/classrooms:
+    get:
+      summary: "Get classrooms joined by a student"
+      description: "Retrieve all classrooms a specific student has joined."
+      tags:
+        - Classroom Join
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          description: "The unique identifier of the student."
+          schema:
+            type: string
+            format: uuid
+            example: "987e6543-b21a-34c5-d678-123456789abc"
+      responses:
+        200:
+          description: "List of classrooms the student has joined."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  student_id:
+                    type: string
+                    format: uuid
+                    description: "The ID of the student."
+                  classrooms:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        classroom_id:
+                          type: string
+                          format: uuid
+                        classroom_name:
+                          type: string
+                          description: "The name of the classroom."
+                        subject:
+                          type: string
+                          description: "The subject of the classroom."
+                      example:
+                        classroom_id: "123e4567-e89b-12d3-a456-426614174000"
+                        classroom_name: "Physics 101"
+                        subject: "Physics"
+        404:
+          description: "Student not found or no classrooms joined."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No classrooms found for the student."
+        500:
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve classrooms."
+  /classrooms/{classroom_id}/students:
+    get:
+      summary: "Get students in a classroom"
+      description: "Retrieve the list of students who have joined a specific classroom."
+      tags:
+        - Classroom Join
+      parameters:
+        - name: classroom_id
+          in: path
+          required: true
+          description: "The unique identifier of the classroom."
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        200:
+          description: "List of students in the classroom."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  classroom_id:
+                    type: string
+                    format: uuid
+                    description: "The ID of the classroom."
+                  students:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        student_id:
+                          type: string
+                          format: uuid
+                        student_name:
+                          type: string
+                          description: "The full name of the student."
+                        email:
+                          type: string
+                          format: email
+                          description: "The email of the student."
+                      example:
+                        student_id: "987e6543-b21a-34c5-d678-123456789abc"
+                        student_name: "John Doe"
+                        email: "johndoe@example.com"
+        404:
+          description: "Classroom not found or no students joined."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No students found in the classroom."
+        500:
+          description: "Internal server error."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve students."
+
+  /classrooms/files:
+    post:
+      tags:
+        - Classrooms Files
+      summary: "Add a file to a classroom"
+      description: "Upload a file for a specific classroom."
+      tags:
+        - "Classrooms"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                classroom_id:
+                  type: string
+                  format: uuid
+                  description: "ID of the classroom"
+                title:
+                  type: string
+                  description: "Title of the file"
+                file:
+                  type: string
+                  format: binary
+                  description: "The file to upload"
+      responses:
+        '201':
+          description: "File added successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  classroom_id:
+                    type: string
+                    format: uuid
+                  title:
+                    type: string
+                  file_name:
+                    type: string
+        '400':
+          description: "Bad request"
+        '500':
+          description: "Internal server error"
+
+  /classrooms/files/{classroom_id}:
+    get:
+      tags:
+        - "Classrooms Files"
+      summary: Retrieve files for a specific classroom by ID
+      description: Fetches the list of files associated with a specific classroom using its ID.
+      parameters:
+        - name: classroom_id
+          in: path
+          required: true
+          description: The ID of the classroom for which to retrieve files.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of files associated with the specified classroom.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      description: The URL of the file.
+                    title:
+                      type: string
+                      description: The title of the file.
+        '400':
+          description: Bad Request. The request is missing the required parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the cause of the bad request.
+        '404':
+          description: Not Found. No files were found for the specified classroom ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating no files were found for the classroom ID.
+        '500':
+          description: Internal Server Error. An unexpected error occurred.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message indicating the failure reason.
+    
+  /classrooms/files/{id}:
+    delete:
+      tags:
+        - "Classrooms Files"
+      summary: "Delete a file by ID"
+      description: "Deletes a file record and its associated file from the server"
+      operationId: "deleteFile"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          type: "string"
+          description: "ID of the file to be deleted"
+      responses:
+        200:
+          description: "File deleted successfully"
+        404:
+          description: "File not found"
+        500:
+          description: "Failed to delete file"
+
+
+  /classroom_allocations:
+    get:
+      summary: Get all classroom allocations
+      tags:
+        - Classroom Allocation
+      responses:
+        '200':
+          description: List of all classroom allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ClassroomAllocation'
+    
+    post:
+      summary: Create a new classroom allocation
+      tags:
+        - Classroom Allocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                professor_id:
+                  type: string
+                  description: The ID of the professor assigned to the classroom
+                classroom_name:
+                  type: string
+                  description: The name of the classroom
+                status:
+                  type: string
+                  enum: [open, close, busy]
+                  description: The status of the classroom
+                classroom_description:
+                  type: string
+                  description: Description of the classroom
+      responses:
+        '201':
+          description: Classroom allocation created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the newly created classroom allocation
+                  professor_id:
+                    type: string
+                    description: The ID of the professor assigned to the classroom
+                  classroom_name:
+                    type: string
+                    description: The name of the classroom
+                  status:
+                    type: string
+                    enum: [open, close, busy]
+                    description: The status of the classroom
+                  classroom_description:
+                    type: string
+                    description: Description of the classroom
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the classroom allocation was created
+                  updated_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the classroom allocation was last updated
+
+  /classroom_allocations/professor/{professor_id}:
+    get:
+      tags:
+        - Classroom Allocation
+      summary: Retrieve classroom allocations by professor ID
+      description: Fetch all classroom allocations associated with a specific professor.
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          description: The ID of the professor to filter allocations by.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful retrieval of classroom allocations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    professor_id:
+                      type: string
+                      format: uuid
+                    classroom_name:
+                      type: string
+                    classroom_description:
+                      type: string
+                    status:
+                      type: string
+                      enum: [open, close, busy]
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+        '404':
+          description: No classroom allocations found for this professor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /classroom_allocations/{id}:
+    get:
+      summary: Get classroom allocation by ID
+      tags:
+        - Classroom Allocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom allocation
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Details of the classroom allocation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClassroomAllocation'
+
+    put:
+      summary: Update classroom allocation by ID
+      tags:
+        - Classroom Allocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom allocation to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                professor_id:
+                  type: string
+                  description: The ID of the professor assigned to the classroom
+                classroom_name:
+                  type: string
+                  description: The name of the classroom
+                status:
+                  type: string
+                  enum: [open, close, busy]
+                  description: The status of the classroom
+                classroom_description:
+                  type: string
+                  description: Description of the classroom
+                student_id:
+                  type: string
+                  description: The ID of the student associated with the classroom allocation (optional)
+      responses:
+        '200':
+          description: Classroom allocation updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                  allocation:
+                    $ref: '#/components/schemas/ClassroomAllocation'
+        '404':
+          description: Classroom allocation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+
+    delete:
+      summary: Delete classroom allocation by ID
+      tags:
+        - Classroom Allocation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the classroom allocation
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Classroom allocation deleted
+
+  /jobs:
+    get:
+      tags:
+        - Jobs
+      summary: Get all jobs
+      description: Fetch a list of all job listings
+      responses:
+        200:
+          description: List of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "123e4567-e89b-12d3-a456-426614174000"
+                    professor_id:
+                      type: string
+                      example: "123e4567-e89b-12d3-a456-426614174001"
+                    job_title:
+                      type: string
+                      example: "Software Engineer"
+                    company_name:
+                      type: string
+                      example: "Tech Company"
+                    total_vacancies:
+                      type: integer
+                      example: 5
+                    experience_range:
+                      type: string
+                      example: "0-2 years"
+                    job_type:
+                      type: string
+                      enum:
+                        - full-time
+                        - part-time
+                        - internship
+                        - freelance
+                      example: "full-time"
+                    company_criteria:
+                      type: string
+                      example: "B.Tech in CS/IT"
+                    requirements:
+                      type: string
+                      example: "Java, Python, C++"
+                    passout_batch:
+                      type: string
+                      example: "2022"
+                    job_description:
+                      type: string
+                      example: "Looking for a Software Engineer to join our team."
+                    is_remote:
+                      type: boolean
+                      example: false
+                    preferred_skills:
+                      type: string
+                      example: "React, Node.js"
+                    salary_range:
+                      type: string
+                      example: "50000-70000"
+                    job_location:
+                      type: string
+                      example: "New York, USA"
+                    application_deadline:
+                      type: string
+                      format: date
+                      example: "2024-12-31"
+                    created_at:
+                      type: string
+                      format: date-time
+                      example: "2024-01-01T12:00:00Z"
+                    updated_at:
+                      type: string
+                      format: date-time
+                      example: "2024-01-02T12:00:00Z"
+    post:
+      tags:
+        - Jobs
+      summary: Create a new job
+      description: Add a new job listing
+      requestBody:
+        description: Job object that needs to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                professor_id:
+                  type: string
+                  example: "123e4567-e89b-12d3-a456-426614174001"
+                job_title:
+                  type: string
+                  example: "Software Engineer"
+                company_name:
+                  type: string
+                  example: "Tech Company"
+                total_vacancies:
+                  type: integer
+                  example: 5
+                experience_range:
+                  type: string
+                  example: "0-2 years"
+                job_type:
+                  type: string
+                  enum:
+                    - full-time
+                    - part-time
+                    - internship
+                    - freelance
+                  example: "full-time"
+                company_criteria:
+                  type: string
+                  example: "B.Tech in CS/IT"
+                requirements:
+                  type: string
+                  example: "Java, Python, C++"
+                passout_batch:
+                  type: string
+                  example: "2022"
+                job_description:
+                  type: string
+                  example: "Looking for a Software Engineer to join our team."
+                is_remote:
+                  type: boolean
+                  example: false
+                preferred_skills:
+                  type: string
+                  example: "React, Node.js"
+                salary_range:
+                  type: string
+                  example: "50000-70000"
+                job_location:
+                  type: string
+                  example: "New York, USA"
+                application_deadline:
+                  type: string
+                  format: date
+                  example: "2024-12-31"
+      responses:
+        201:
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  professor_id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174001"
+                  job_title:
+                    type: string
+                    example: "Software Engineer"
+                  company_name:
+                    type: string
+                    example: "Tech Company"
+                  total_vacancies:
+                    type: integer
+                    example: 5
+                  experience_range:
+                    type: string
+                    example: "0-2 years"
+                  job_type:
+                    type: string
+                    enum:
+                      - full-time
+                      - part-time
+                      - internship
+                      - freelance
+                    example: "full-time"
+                  company_criteria:
+                    type: string
+                    example: "B.Tech in CS/IT"
+                  requirements:
+                    type: string
+                    example: "Java, Python, C++"
+                  passout_batch:
+                    type: string
+                    example: "2022"
+                  job_description:
+                    type: string
+                    example: "Looking for a Software Engineer to join our team."
+                  is_remote:
+                    type: boolean
+                    example: false
+                  preferred_skills:
+                    type: string
+                    example: "React, Node.js"
+                  salary_range:
+                    type: string
+                    example: "50000-70000"
+                  job_location:
+                    type: string
+                    example: "New York, USA"
+                  application_deadline:
+                    type: string
+                    format: date
+                    example: "2024-12-31"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-01T12:00:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-02T12:00:00Z"
+
+  /jobs/professor/{professor_id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get all jobs by professor ID
+      parameters:
+        - name: professor_id
+          in: path
+          required: true
+          description: ID of the professor
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    professor_id:
+                      type: string
+                    job_title:
+                      type: string
+                    company_name:
+                      type: string
+                    total_vacancies:
+                      type: integer
+                    experience_range:
+                      type: string
+                    job_type:
+                      type: string
+                    company_criteria:
+                      type: string
+                    requirements:
+                      type: string
+                    passout_batch:
+                      type: string
+                    job_description:
+                      type: string
+                    is_remote:
+                      type: boolean
+                    preferred_skills:
+                      type: string
+                    salary_range:
+                      type: string
+                    job_location:
+                      type: string
+                    application_deadline:
+                      type: string
+                      format: date
+        '404':
+          description: No jobs found for the given professor ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /jobs/{id}:
+    get:
+      tags:
+        - Jobs
+      summary: Get a job by ID
+      description: Fetch a single job by its unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The job ID
+      responses:
+        200:
+          description: Job details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  professor_id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174001"
+                  job_title:
+                    type: string
+                    example: "Software Engineer"
+                  company_name:
+                    type: string
+                    example: "Tech Company"
+                  total_vacancies:
+                    type: integer
+                    example: 5
+                  experience_range:
+                    type: string
+                    example: "0-2 years"
+                  job_type:
+                    type: string
+                    enum:
+                      - full-time
+                      - part-time
+                      - internship
+                      - freelance
+                    example: "full-time"
+                  company_criteria:
+                    type: string
+                    example: "B.Tech in CS/IT"
+                  requirements:
+                    type: string
+                    example: "Java, Python, C++"
+                  passout_batch:
+                    type: string
+                    example: "2022"
+                  job_description:
+                    type: string
+                    example: "Looking for a Software Engineer to join our team."
+                  is_remote:
+                    type: boolean
+                    example: false
+                  preferred_skills:
+                    type: string
+                    example: "React, Node.js"
+                  salary_range:
+                    type: string
+                    example: "50000-70000"
+                  job_location:
+                    type: string
+                    example: "New York, USA"
+                  application_deadline:
+                    type: string
+                    format: date
+                    example: "2024-12-31"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-01T12:00:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-02T12:00:00Z"
+    put:
+      tags:
+        - Jobs
+      summary: Update a job by ID
+      description: Update an existing job by its unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The job ID
+      requestBody:
+        description: Job object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                job_title:
+                  type: string
+                  example: "Software Engineer"
+                company_name:
+                  type: string
+                  example: "Tech Company"
+                total_vacancies:
+                  type: integer
+                  example: 5
+                experience_range:
+                  type: string
+                  example: "0-2 years"
+                job_type:
+                  type: string
+                  enum:
+                    - full-time
+                    - part-time
+                    - internship
+                    - freelance
+                  example: "full-time"
+                company_criteria:
+                  type: string
+                  example: "B.Tech in CS/IT"
+                requirements:
+                  type: string
+                  example: "Java, Python, C++"
+                passout_batch:
+                  type: string
+                  example: "2022"
+                job_description:
+                  type: string
+                  example: "Looking for a Software Engineer to join our team."
+                is_remote:
+                  type: boolean
+                  example: false
+                preferred_skills:
+                  type: string
+                  example: "React, Node.js"
+                salary_range:
+                  type: string
+                  example: "50000-70000"
+                job_location:
+                  type: string
+                  example: "New York, USA"
+                application_deadline:
+                  type: string
+                  format: date
+                  example: "2024-12-31"
+      responses:
+        200:
+          description: Job updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  professor_id:
+                    type: string
+                    example: "123e4567-e89b-12d3-a456-426614174001"
+                  job_title:
+                    type: string
+                    example: "Software Engineer"
+                  company_name:
+                    type: string
+                    example: "Tech Company"
+                  total_vacancies:
+                    type: integer
+                    example: 5
+                  experience_range:
+                    type: string
+                    example: "0-2 years"
+                  job_type:
+                    type: string
+                    enum:
+                      - full-time
+                      - part-time
+                      - internship
+                      - freelance
+                    example: "full-time"
+                  company_criteria:
+                    type: string
+                    example: "B.Tech in CS/IT"
+                  requirements:
+                    type: string
+                    example: "Java, Python, C++"
+                  passout_batch:
+                    type: string
+                    example: "2022"
+                  job_description:
+                    type: string
+                    example: "Looking for a Software Engineer to join our team."
+                  is_remote:
+                    type: boolean
+                    example: false
+                  preferred_skills:
+                    type: string
+                    example: "React, Node.js"
+                  salary_range:
+                    type: string
+                    example: "50000-70000"
+                  job_location:
+                    type: string
+                    example: "New York, USA"
+                  application_deadline:
+                    type: string
+                    format: date
+                    example: "2024-12-31"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-01T12:00:00Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-01-02T12:00:00Z"
+    delete:
+      tags:
+        - Jobs
+      summary: Delete a job by ID
+      description: Remove a job listing by its unique ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The job ID
+      responses:
+        204:
+          description: Job deleted successfully
+
+  /job-applications:
+    post:
+      summary: Create a new job application
+      tags:
+        - Job Applications
+      requestBody:
+        description: Job application details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+                job_id:
+                  type: string
+      responses:
+        '201':
+          description: Job application created
+        '500':
+          description: Error creating job application
+
+  /job-applications/{id}:
+    get:
+      summary: Get a job application by ID
+      tags:
+        - Job Applications
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the job application
+      responses:
+        '200':
+          description: Job application details
+        '404':
+          description: Job application not found
+        '500':
+          description: Error fetching job application
+    put:
+      summary: Update the status of a job application
+      tags:
+        - Job Applications
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the job application
+      requestBody:
+        description: Updated job application status
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Job application status updated
+        '500':
+          description: Error updating job application status
+    delete:
+      summary: Delete a job application
+      tags:
+        - Job Applications
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the job application
+      responses:
+        '200':
+          description: Job application deleted
+        '404':
+          description: Job application not found
+        '500':
+          description: Error deleting job application
+
+  /job-applications/student/{student_id}:
+    get:
+      summary: Get all job applications for a specific student
+      tags:
+        - Job Applications
+      parameters:
+        - in: path
+          name: student_id
+          schema:
+            type: string
+          required: true
+          description: ID of the student
+      responses:
+        '200':
+          description: List of job applications for the student
+        '500':
+          description: Error fetching applications for student
+
+  /job-applications/job/{job_id}:
+    get:
+      summary: Get all job applications for a specific job
+      tags:
+        - Job Applications
+      parameters:
+        - in: path
+          name: job_id
+          schema:
+            type: string
+          required: true
+          description: ID of the job
+      responses:
+        '200':
+          description: List of job applications for the job
+        '500':
+          description: Error fetching applications for job
+  /save-jobs:
+    post:
+      summary: Save a job for a student
+      tags:
+        - Save Jobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+                  description: The ID of the student saving the job
+                job_id:
+                  type: string
+                  description: The ID of the job being saved
+              required:
+                - student_id
+                - job_id
+      responses:
+        '201':
+          description: Job saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the saved job entry
+                  student_id:
+                    type: string
+                    description: The ID of the student
+                  job_id:
+                    type: string
+                    description: The ID of the saved job
+        '500':
+          description: Error saving job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /save-jobs/{id}:
+    get:
+      summary: Retrieve a saved job by ID
+      tags:
+        - Save Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the saved job
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved saved job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: The ID of the saved job entry
+                  student_id:
+                    type: string
+                    description: The ID of the student
+                  job_id:
+                    type: string
+                    description: The ID of the saved job
+        '404':
+          description: Saved job not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        '500':
+          description: Error fetching saved job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+    delete:
+      summary: Delete a saved job by ID
+      tags:
+        - Save Jobs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the saved job
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted saved job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message
+        '404':
+          description: Saved job not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        '500':
+          description: Error deleting saved job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /save-jobs/student/{student_id}:
+    get:
+      summary: Retrieve all saved jobs for a specific student
+      tags:
+        - Save Jobs
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          description: The ID of the student
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved saved jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The ID of the saved job entry
+                    student_id:
+                      type: string
+                      description: The ID of the student
+                    job_id:
+                      type: string
+                      description: The ID of the saved job
+        '500':
+          description: Error fetching saved jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
